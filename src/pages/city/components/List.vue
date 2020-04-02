@@ -1,0 +1,124 @@
+<template>
+  <div class="list" ref="wrapper">
+    <div>
+      <div class="area">
+        <div class="title border-topbottom">当前城市</div>
+        <div class="button-list">
+          <div class="button-wrapper">
+            <div class="button">{{this.currentCity}}</div>
+          </div>
+        </div>
+      </div>
+      <div class="area">
+        <div class="title border-topbottom">热门城市</div>
+        <div class="button-list">
+          <div class="button-wrapper" 
+            v-for="item of hot" 
+            :key="item.id"
+            @click="handleCityClick(item.name)">
+            <div class="button">{{item.name}}</div>
+          </div>
+        </div>
+      </div>
+      <div 
+        class="area" 
+        v-for="(item,key) of cities" 
+        :key="key"
+        :ref="key"
+      >
+        <div class="title border-topbottom">{{key}}</div>
+        <div class="item-list">
+          <div 
+            class="item border-bottom" 
+            v-for="innerItem of item" 
+            :key="innerItem.id"
+            @click="handleCityClick(innerItem.name)">
+            {{innerItem.name}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+import Bscroll from 'better-scroll'
+import { mapState, mapMutations} from 'vuex'
+export default {
+  name: 'CityList',
+  props: {
+    cities: Object,
+    hot: Array,
+    letter:String
+  },
+  computed:{
+    ...mapState({
+      currentCity:'city'
+    })  //city共用数据映射到currentCity的计算属性中，...是展开运算符
+  },
+  methods:{
+    handleCityClick (city) {
+      // this.$store.commit('changeCity',city)
+      this.changeCity(city)
+      this.$router.push('/')//$router是实例属性
+    },
+    ...mapMutations(['changeCity'])
+  },
+  mounted () {
+    this.scroll = new Bscroll(this.$refs.wrapper)
+  },
+  watch:{
+    //监听器，监听letter的变化
+    letter () {
+      if (this.letter) {
+        const elememt = this.$refs[this.letter][0]
+        this.scroll.scrollToElement(elememt)
+      }
+      
+    }
+  }
+}
+</script>
+<style lang="stylus" scoped>
+  @import '~styles/varibles.styl'
+  .border-topbottom
+    &:before
+      border-color #789911
+    &:after
+      border-color #ccc
+  .list
+    position absolute
+    top 1.58rem
+    left 0 
+    right 0
+    bottom 0
+    overflow hidden
+    .title
+      line-height .54rem
+      background #eeeeee
+      padding-left .2rem
+      font-size: 0.3rem;
+      color: #000;
+    .button-list
+      overflow hidden
+      padding .1rem .6rem .1rem .1rem
+      .button-wrapper
+        float left
+        width 33.33%
+        .button 
+          margin .1rem
+          text-align center
+          border-radius .1rem
+          border 0.02rem solid #588197
+          padding .1rem 0
+    .item-list
+      .item
+        line-height .6rem
+        color #666
+        padding 0.1rem
+      .border-bottom
+        &:before
+          border-color #000
+        &:after
+          border-color #000
+
+</style>
